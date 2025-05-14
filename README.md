@@ -1,137 +1,55 @@
 # Clinic Booking System Schema
 
 ## Overview
-The Clinic Booking System is designed to manage the scheduling of appointments, patient records, doctor information, and services offered in a healthcare setting. This schema provides a structured way to store and retrieve data related to departments, doctors, patients, appointments, services, medications, and prescriptions.
+This repository contains the database schema for a Clinic Booking System. The schema is designed to manage departments, doctors, patients, appointments, services, medications, and prescriptions in a healthcare environment.
 
-## Database Tables
+## Tables and Relationships
 
-### 1. Departments
-Stores information about the various departments within the clinic.
+### Departments
+- Stores clinic departments.
+- `department_id`: Primary key.
+- `name`: Unique department name.
 
-```sql
-CREATE TABLE departments (
-    department_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE
-);
-department_id: Unique identifier for each department (Primary Key).
-name: Name of the department (Unique).
-2. Doctors
-Stores information about the doctors working in the clinic.
+### Doctors
+- Stores information about doctors.
+- `doctor_id`: Primary key.
+- `name`, `email` (unique), `phone`.
+- Foreign key: `department_id` references `departments`.
 
-sql
-Run
-Copy code
-CREATE TABLE doctors (
-    doctor_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    phone VARCHAR(20) NOT NULL,
-    department_id INT,
-    FOREIGN KEY (department_id) REFERENCES departments(department_id)
-);
-doctor_id: Unique identifier for each doctor (Primary Key).
-name: Name of the doctor.
-email: Email address of the doctor (Unique).
-phone: Contact number of the doctor.
-department_id: Foreign key referencing the department the doctor belongs to.
-3. Patients
-Stores information about the patients visiting the clinic.
+### Patients
+- Stores patient records.
+- `patient_id`: Primary key.
+- `name`, `date_of_birth`, `email` (unique), `phone`.
 
-sql
-Run
-Copy code
-CREATE TABLE patients (
-    patient_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    date_of_birth DATE NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    phone VARCHAR(20) NOT NULL
-);
-patient_id: Unique identifier for each patient (Primary Key).
-name: Name of the patient.
-date_of_birth: Date of birth of the patient.
-email: Email address of the patient (Unique).
-phone: Contact number of the patient.
-4. Appointments
-Stores information about the appointments scheduled by patients with doctors.
+### Appointments
+- Tracks patient appointments with doctors.
+- `appointment_id`: Primary key.
+- Foreign keys: `patient_id` references `patients`, `doctor_id` references `doctors`.
+- Includes `appointment_date`, `reason`, and `status` (Scheduled, Completed, Cancelled).
 
-sql
-Run
-Copy code
-CREATE TABLE appointments (
-    appointment_id INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id INT NOT NULL,
-    doctor_id INT NOT NULL,
-    appointment_date DATETIME NOT NULL,
-    reason TEXT,
-    status ENUM('Scheduled', 'Completed', 'Cancelled') DEFAULT 'Scheduled',
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
-    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id)
-);
-appointment_id: Unique identifier for each appointment (Primary Key).
-patient_id: Foreign key referencing the patient who booked the appointment.
-doctor_id: Foreign key referencing the doctor assigned to the appointment.
-appointment_date: Date and time of the appointment.
-reason: Reason for the appointment.
-status: Current status of the appointment (Scheduled, Completed, Cancelled).
-5. Services
-Stores information about the various services offered by the clinic.
+### Services
+- Lists services offered by the clinic.
+- `service_id`: Primary key.
+- `name` (unique), `cost`.
 
-sql
-Run
-Copy code
-CREATE TABLE services (
-    service_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE,
-    cost DECIMAL(10,2) NOT NULL
-);
-service_id: Unique identifier for each service (Primary Key).
-name: Name of the service (Unique).
-cost: Cost of the service.
-6. Doctor-Services
-Manages the many-to-many relationship between doctors and services.
+### Doctor-Services
+- Many-to-many relation between doctors and services.
+- Composite primary key: (`doctor_id`, `service_id`).
+- Foreign keys to `doctors` and `services`.
 
-sql
-Run
-Copy code
-CREATE TABLE doctor_services (
-    doctor_id INT NOT NULL,
-    service_id INT NOT NULL,
-    PRIMARY KEY (doctor_id, service_id),
-    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id),
-    FOREIGN KEY (service_id) REFERENCES services(service_id)
-);
-doctor_id: Foreign key referencing the doctor providing the service.
-service_id: Foreign key referencing the service offered.
-7. Medications
-Stores information about medications available in the clinic.
+### Medications
+- Stores medication details.
+- `medication_id`: Primary key.
+- `name`, `dosage`.
 
-sql
-Run
-Copy code
-CREATE TABLE medications (
-    medication_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    dosage VARCHAR(50) NOT NULL
-);
-medication_id: Unique identifier for each medication (Primary Key).
-name: Name of the medication.
-dosage: Dosage information for the medication.
-8. Prescriptions
-Stores information about prescriptions given to patients during appointments.
+### Prescriptions
+- Links medications with appointments.
+- `prescription_id`: Primary key.
+- Foreign keys: `appointment_id` (unique), `medication_id`.
+- Includes `instructions`.
 
-sql
-Run
-Copy code
-CREATE TABLE prescriptions (
-    prescription_id INT AUTO_INCREMENT PRIMARY KEY,
-    appointment_id INT NOT NULL UNIQUE,
-    medication_id INT NOT NULL,
-    instructions TEXT,
-    FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id),
-    FOREIGN KEY (medication_id) REFERENCES medications(medication_id)
-);
-prescription_id: Unique identifier for each prescription (Primary Key).
-appointment_id: Foreign key referencing the appointment (unique one-to-one).
-medication_id: Foreign key referencing the medication prescribed.
-instructions: Directions for taking the medication.
+## Usage
+Use the SQL `CREATE TABLE` statements in this repository to set up the database schema needed for the Clinic Booking System.
+
+## License
+This project is open source and free to use.
